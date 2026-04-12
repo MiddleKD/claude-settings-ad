@@ -2,6 +2,19 @@
 
 middlek의 Claude Code 개인 설정 저장소. 플러그인 조합을 프리셋으로 관리한다.
 
+## 설치 / 제거
+
+```bash
+# 설치 (원라인)
+git clone https://github.com/MiddleKD/claude-settings-ad.git ~/.claude/$(whoami)_settings && bash ~/.claude/$(whoami)_settings/plugin/utils/install-to-home.sh
+
+# 제거 (원라인)
+bash ~/.claude/$(whoami)_settings/plugin/utils/restore-from-home.sh && rm -rf ~/.claude/$(whoami)_settings
+```
+
+install 스크립트가 `plugin/deploy/.generated/` 에 경로가 치환된 settings.json을 생성하고,
+`~/.agent-deck/config.toml` 에 profiles 블록을 추가한다.
+
 ## 구조
 
 ```
@@ -107,19 +120,6 @@ sudo apt install ripgrep  # Ubuntu/Debian
 
 이 저장소를 마켓플레이스로 다른 프로젝트에 추가하면 `plugin/`(훅, 스킬, MCP 설정)만 전달된다.  
 `.claude/settings.json`(`extraKnownMarketplaces`, `enabledPlugins`)은 각 환경에서 별도 구성이 필요하다.
-
-### 설치 / 제거
-
-```bash
-# 설치 (원라인)
-git clone https://github.com/MiddleKD/claude-settings-ad.git ~/.claude/$(whoami)_settings && bash ~/.claude/$(whoami)_settings/plugin/utils/install-to-home.sh
-
-# 제거 (원라인)
-bash ~/.claude/$(whoami)_settings/plugin/utils/restore-from-home.sh && rm -rf ~/.claude/$(whoami)_settings
-```
-
-install 스크립트가 `plugin/deploy/.generated/` 에 경로가 치환된 settings.json을 생성하고,
-`~/.agent-deck/config.toml` 에 profiles 블록을 추가한다.
 
 ### 프로필 목록
 
