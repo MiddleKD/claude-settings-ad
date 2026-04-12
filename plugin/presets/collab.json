@@ -1,0 +1,19 @@
+{
+  "preset": "collab",
+  "description": "AI-DLC 협업: middlek + chorus + superpowers. AI propose → human verify 파이프라인.",
+  "requires": ["CHORUS_URL", "CHORUS_API_KEY", "chorus 서버 실행 중"],
+  "enabledPlugins": {
+    "middlek-settings@middlek-settings": true,
+    "superpowers@claude-plugins-official": true,
+    "agent-deck@agent-deck": false,
+    "tdd-guard@tdd-guard": false,
+    "chorus@chorus": true
+  },
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
+  },
+  "notes": {
+    "chorus_roles": "PM 에이전트는 Agent(model:'opus') 명시 권장. chorus SubagentStart 훅이 역할을 additionalContext로 주입.",
+    "mcp": "chorus MCP server는 CHORUS_URL/api/mcp 에서 자동 등록됨 (plugin/deploy/claude-collab/settings.json 참조)"
+  }
+}

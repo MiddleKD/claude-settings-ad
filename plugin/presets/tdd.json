@@ -1,0 +1,15 @@
+{
+  "preset": "tdd",
+  "description": "TDD 강제 적용: middlek + superpowers + tdd-guard. 편집 시 테스트 선행 여부를 AI로 검증.",
+  "requires": ["Node.js/npx", "ANTHROPIC_API_KEY (tdd-guard AI validation용)"],
+  "enabledPlugins": {
+    "middlek-settings@middlek-settings": true,
+    "superpowers@claude-plugins-official": true,
+    "agent-deck@agent-deck": false,
+    "tdd-guard@tdd-guard": true,
+    "chorus@chorus": false
+  },
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
+  }
+}

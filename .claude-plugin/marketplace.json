@@ -1,0 +1,13 @@
+{
+  "name": "middlek-settings",
+  "owner": {
+    "name": "middlek"
+  },
+  "plugins": [
+    {
+      "name": "middlek-settings",
+      "source": "./plugin",
+      "description": "Personal Claude Code hooks and settings"
+    }
+  ]
+}

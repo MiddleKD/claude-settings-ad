@@ -1,0 +1,15 @@
+{
+  "preset": "solo",
+  "description": "기본 개인 개발: middlek + superpowers. brainstorming → writing-plans → subagent-driven-development 워크플로우.",
+  "requires": [],
+  "enabledPlugins": {
+    "middlek-settings@middlek-settings": true,
+    "superpowers@claude-plugins-official": true,
+    "agent-deck@agent-deck": false,
+    "tdd-guard@tdd-guard": false,
+    "chorus@chorus": false
+  },
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "haiku"
+  }
+}

@@ -1,0 +1,16 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+claude-settings-session.json
+.env
+.serena/memories
+.serena/session-data
+.serena/.gitignore
+plugin/deploy/.generated/

@@ -1,0 +1,15 @@
+{
+  "preset": "minimal",
+  "description": "최소 구성: middlek만 활성. 빠른 작업, 토큰 절약이 우선일 때.",
+  "requires": [],
+  "enabledPlugins": {
+    "middlek-settings@middlek-settings": true,
+    "superpowers@claude-plugins-official": false,
+    "agent-deck@agent-deck": false,
+    "tdd-guard@tdd-guard": false,
+    "chorus@chorus": false
+  },
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "haiku"
+  }
+}

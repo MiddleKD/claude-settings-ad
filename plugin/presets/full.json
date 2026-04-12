@@ -1,0 +1,20 @@
+{
+  "preset": "full",
+  "description": "풀스택 로컬 개발: middlek + superpowers + agent-deck skills. Codex/Gemini 상담, MCP Pool, 세션 공유 포함.",
+  "requires": ["agent-deck 바이너리 설치"],
+  "enabledPlugins": {
+    "middlek-settings@middlek-settings": true,
+    "superpowers@claude-plugins-official": true,
+    "agent-deck@agent-deck": true,
+    "tdd-guard@tdd-guard": false,
+    "chorus@chorus": false
+  },
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "haiku"
+  },
+  "notes": {
+    "agent_deck_profiles": "agent-deck -p full 로 실행. ~/.agent-deck/config.toml에 [profiles.full.claude] config_dir 추가 필요.",
+    "mcp_pool": "config.toml에서 mcp_pool.pool_all=true 활성화 시 Serena 공유 → 메모리 절감",
+    "multi_tool": "launch-subagent.sh --tool codex|gemini 로 Codex/Gemini 상담 가능"
+  }
+}

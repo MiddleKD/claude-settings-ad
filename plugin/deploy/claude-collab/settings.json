@@ -1,0 +1,66 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(touch:*)",
+      "Bash(cp:*)"
+    ],
+    "defaultMode": "bypassPermissions"
+  },
+  "alwaysThinkingEnabled": true,
+  "showThinkingSummaries": true,
+  "skipDangerousModePermissionPrompt": true,
+  "advisorModel": "opus",
+  "env": {
+    "ANTHROPIC_MODEL": "claude-sonnet-4-6",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-6",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5-20251001",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
+    "MAX_THINKING_TOKENS": "10000",
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "50",
+    "CLAUDE_AUTO_BACKGROUND_TASKS": "1",
+    "SERENA_MAX_MEMORY_FILES": "10",
+    "SERENA_MAX_MEMORY_LINES": "100"
+  },
+  "enabledPlugins": {
+    "middlek-settings@middlek-settings": true,
+    "superpowers@claude-plugins-official": true,
+    "agent-deck@agent-deck": false,
+    "tdd-guard@tdd-guard": false,
+    "chorus@chorus": true,
+    "codex@openai-codex": false
+  },
+  "extraKnownMarketplaces": {
+    "middlek-settings": {
+      "source": {
+        "source": "directory",
+        "path": "__PLUGIN_DIR__"
+      }
+    },
+    "agent-deck": {
+      "source": {
+        "source": "github",
+        "repo": "asheshgoplani/agent-deck"
+      }
+    },
+    "tdd-guard": {
+      "source": {
+        "source": "github",
+        "repo": "nizos/tdd-guard"
+      }
+    },
+    "chorus": {
+      "source": {
+        "source": "github",
+        "repo": "Chorus-AIDLC/Chorus"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "npm",
+        "package": "@openai/codex-plugin-cc"
+      }
+    }
+  }
+}

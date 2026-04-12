@@ -1,0 +1,56 @@
+{
+  "hooks": {
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SubagentStart\",\"additionalContext\":\"[Subagent Guide]\\n- Call advisor() when facing complex tasks or problems that are hard to solve\\n- Report results as much as necessary.\"}}'"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ \"$CLAUDE_USAGE_MONITOR\" = \"1\" ] && exit 0; PIDFILE=/tmp/claude-usage-monitor.pid; if [ -f \"$PIDFILE\" ] && kill -0 \"$(cat \"$PIDFILE\")\" 2>/dev/null; then exit 0; fi; echo $$ > \"$PIDFILE\"; RESULT=$(CLAUDE_USAGE_MONITOR=1 claude -p '.' 2>&1); if [ $? -eq 0 ] || ! echo \"$RESULT\" | grep -qiE 'rate.limit|usage.*limit|quota|too many|exceeded|429|credit'; then rm -f \"$PIDFILE\"; exit 0; fi; while true; do sleep 60; RESULT=$(CLAUDE_USAGE_MONITOR=1 claude -p '.' 2>&1); if [ $? -eq 0 ]; then rm -f \"$PIDFILE\"; echo '✅ Claude usage 복구됨 - 이전 작업을 이어서 진행하세요'; exit 2; fi; done",
+            "asyncRewake": true,
+            "rewakeMessage": "Claude usage가 복구되었습니다. 이전 작업을 이어서 진행하세요:"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start-bootstrap.js\""
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-end.js\"",
+            "async": true,
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-compact.js\""
+          }
+        ]
+      }
+    ]
+  }
+}
