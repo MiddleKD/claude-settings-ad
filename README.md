@@ -1,4 +1,4 @@
-# claude-settings
+# claude-settings-ad
 
 middlek의 Claude Code 개인 설정 저장소. 플러그인 조합을 프리셋으로 관리한다.
 
@@ -112,7 +112,7 @@ sudo apt install ripgrep  # Ubuntu/Debian
 
 ```bash
 # 설치 (원라인)
-git clone <REPO_URL> ~/.claude/$(whoami)_settings && bash ~/.claude/$(whoami)_settings/plugin/utils/install-to-home.sh
+git clone https://github.com/MiddleKD/claude-settings-ad.git ~/.claude/$(whoami)_settings && bash ~/.claude/$(whoami)_settings/plugin/utils/install-to-home.sh
 
 # 제거 (원라인)
 bash ~/.claude/$(whoami)_settings/plugin/utils/restore-from-home.sh && rm -rf ~/.claude/$(whoami)_settings
