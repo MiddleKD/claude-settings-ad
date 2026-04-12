@@ -48,9 +48,9 @@ function main() {
     }
   }
 
-  // 이전 세션 데이터 (2단계에서 참고용)
+  // 이전 세션 데이터 (3단계에서 참고용)
   if (state) {
-    lines.push(`[이전 세션 데이터 - 2단계에서 참고]`);
+    lines.push(`[이전 세션 데이터 - 3단계에서 참고]`);
     lines.push(`타임스탬프: ${state.timestamp || '알 수 없음'}`);
     lines.push(`브랜치: ${state.branch || 'unknown'}`);
 
@@ -113,7 +113,8 @@ function main() {
     lines.push('1. [onboarding] 이미 완료됨 — 다음 단계');
   }
   lines.push('2. [컨텍스트 로드] mcp__serena__list_memories 실행 → 현재 프로젝트 context 복원');
-  lines.push('3. [메모리 반영] 이전 세션 데이터가 아래 체크리스트를 충족할 때만 mcp__serena__write_memory 실행:\n   - [ ] 매우 중요한 아키텍처 결정/컨벤션/트레이드오프가 발생\n   - [ ] memory에 없는 내용 추가 (있으면 저장 금지)\n   - [ ] memory와 모순되는 변경사항 반영');
+  lines.push('3. [변경 사항 파악] 이전 세션 데이터를 기반으로 중요 변경 사항을 파악해라');
+  lines.push('4. [메모리 반영] 파악한 내용 중 아래 체크리스트 중 하나라도 충족하면 mcp__serena__write_memory 실행:\n   - [ ] 매우 중요한 아키텍처 결정/컨벤션/트레이드오프가 발생한 경우\n   - [ ] memory에 없는 새로운 내용 추가\n   - [ ] 기존 memory와 모순되는 변경사항 반영');
 
   // 제한 초과 시 정리 지시 추가
   if (fileCountExceeded || oversizedFiles.length > 0) {
@@ -125,8 +126,8 @@ function main() {
       const fileList = oversizedFiles.map(f => `${f.name}(${f.lines}줄)`).join(', ');
       cleanupReasons.push(`라인 수 상한(${MAX_MEMORY_LINES}줄) 초과 파일: ${fileList}`);
     }
-    lines.push(`4. [메모리 정리] ${cleanupReasons.join(' / ')}\n   - 파일 수 초과: mcp__serena__delete_memory로 중복/오래된 항목 삭제 후 관련 항목 통합\n   - 라인 초과: mcp__serena__edit_memory로 해당 파일의 중복·오래된 내용 압축`);
-  }
+    lines.push(`5. [메모리 정리] ${cleanupReasons.join(' / ')}\n   - 파일 수 초과: mcp__serena__delete_memory로 중복/오래된 항목 삭제 후 관련 항목 통합\n   - 라인 초과: mcp__serena__edit_memory로 해당 파일의 중복·오래된 내용 압축`);
+  } 
 
   const additionalContext = lines.join('\n');
 
