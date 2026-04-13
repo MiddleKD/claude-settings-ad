@@ -28,14 +28,20 @@
     "superpowers@claude-plugins-official": true,
     "agent-deck@agent-deck": false,
     "tdd-guard@tdd-guard": false,
-    "chorus@chorus": true,
-    "codex@openai-codex": false
+    "chorus@chorus-plugins": true,
+    "codex@openai-codex": true
   },
   "extraKnownMarketplaces": {
     "middlek-settings": {
       "source": {
         "source": "directory",
         "path": "__PLUGIN_DIR__"
+      }
+    },
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
       }
     },
     "agent-deck": {
@@ -50,7 +56,7 @@
         "repo": "nizos/tdd-guard"
       }
     },
-    "chorus": {
+    "chorus-plugins": {
       "source": {
         "source": "github",
         "repo": "Chorus-AIDLC/Chorus"
@@ -58,8 +64,8 @@
     },
     "openai-codex": {
       "source": {
-        "source": "npm",
-        "package": "@openai/codex-plugin-cc"
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
       }
     }
   }
