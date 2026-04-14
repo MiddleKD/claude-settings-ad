@@ -41,8 +41,31 @@ else
   echo "      블록 없음 (건너뜀)"
 fi
 
-# 2. ~/.codex/config.toml 에서 middlek-presets 블록 제거 + 기존 값 복원
-echo "[2/3] ~/.codex/config.toml 에서 middlek-presets 블록 제거..."
+# 2. ~/.agent-deck/skills/sources.toml 에서 middlek-presets 블록 제거
+echo "[2/3] ~/.agent-deck/skills/sources.toml 에서 middlek skill source 제거..."
+if [ ! -f "$HOME/.agent-deck/skills/sources.toml" ]; then
+  echo "      없음 (건너뜀)"
+elif grep -q "BEGIN middlek-presets" "$HOME/.agent-deck/skills/sources.toml" 2>/dev/null; then
+  python3 - <<'PYEOF'
+import re, os
+
+config_path = os.path.expanduser("~/.agent-deck/skills/sources.toml")
+with open(config_path, "r") as f:
+    content = f.read()
+
+cleaned = re.sub(r'\n*# BEGIN middlek-presets.*?# END middlek-presets\n?', '', content, flags=re.DOTALL)
+
+with open(config_path, "w") as f:
+    f.write(cleaned.rstrip() + "\n")
+
+print("      완료: middlek-presets 블록 제거됨")
+PYEOF
+else
+  echo "      블록 없음 (건너뜀)"
+fi
+
+# 3. ~/.codex/config.toml 에서 middlek-presets 블록 제거 + 기존 값 복원
+echo "[3/3] ~/.codex/config.toml 에서 middlek-presets 블록 제거..."
 if [ ! -f "$HOME/.codex/config.toml" ]; then
   echo "      없음 (건너뜀)"
 elif grep -q "BEGIN middlek-presets" "$HOME/.codex/config.toml" 2>/dev/null; then

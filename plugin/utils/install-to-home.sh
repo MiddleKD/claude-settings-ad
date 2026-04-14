@@ -30,7 +30,7 @@ for preset in claude-tdd claude-collab claude-full claude-minimal; do
 done
 
 # 2. ~/.agent-deck/config.toml 패치
-echo "[2/3] ~/.agent-deck/config.toml 에 profiles 블록 추가..."
+echo "[2/4] ~/.agent-deck/config.toml 에 profiles 블록 추가..."
 if [ ! -f "$HOME/.agent-deck/config.toml" ]; then
   echo "      주의: ~/.agent-deck/config.toml 이 없습니다. agent-deck 를 먼저 설치하세요."
   echo "      profiles 블록 추가를 건너뜁니다."
@@ -44,8 +44,27 @@ else
   echo "      완료: profiles.tdd, collab, full, minimal 추가됨"
 fi
 
-# 3. ~/.codex/config.toml 패치
-echo "[3/3] ~/.codex/config.toml 에 codex 설정 추가..."
+# 3. ~/.agent-deck/skills/sources.toml 패치
+echo "[3/4] ~/.agent-deck/skills/sources.toml 에 middlek skill source 추가..."
+if [ ! -f "$HOME/.agent-deck/config.toml" ]; then
+  echo "      주의: ~/.agent-deck/config.toml 이 없습니다. agent-deck 를 먼저 설치하세요."
+  echo "      skill source 추가를 건너뜁니다."
+else
+  mkdir -p "$HOME/.agent-deck/skills"
+  if grep -q "BEGIN middlek-presets" "$HOME/.agent-deck/skills/sources.toml" 2>/dev/null; then
+    echo "      이미 병합됨 — 건너뜁니다."
+  else
+    SKILLS_TOML="$HOME/.agent-deck/skills/sources.toml"
+    [ -s "$SKILLS_TOML" ] && echo "" >> "$SKILLS_TOML"
+    sed "s|__PLUGIN_DIR__|$PLUGIN_DIR|g" \
+      "$DEPLOY_DIR/agent-deck-skills-patch.toml" \
+      >> "$SKILLS_TOML"
+    echo "      완료: sources.middlek 추가됨"
+  fi
+fi
+
+# 4. ~/.codex/config.toml 패치
+echo "[4/4] ~/.codex/config.toml 에 codex 설정 추가..."
 mkdir -p "$HOME/.codex"
 if grep -q "BEGIN middlek-presets" "$HOME/.codex/config.toml" 2>/dev/null; then
   echo "      이미 병합됨 — 건너뜁니다."
