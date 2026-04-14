@@ -158,7 +158,7 @@ function main() {
       const fileList = oversizedFiles.map(f => `${f.name}(${f.lines} lines)`).join(', ');
       cleanupReasons.push(`files exceeding line limit (${MAX_MEMORY_LINES}): ${fileList}`);
     }
-    lines.push(`5. [memory cleanup] ${cleanupReasons.join(' / ')}\n   - too many files: delete duplicates/stale with mcp__serena__delete_memory, merge related entries\n   - oversized files: compress duplicates/stale content with mcp__serena__edit_memory`);
+    lines.push(`5. [memory compact] ${cleanupReasons.join(' / ')}\n   - too many files: delete duplicates/stale with mcp__serena__delete_memory, merge related entries\n   - oversized files: compress duplicates/stale content with mcp__serena__edit_memory`);
   }
 
   const additionalContext = lines.join('\n');
