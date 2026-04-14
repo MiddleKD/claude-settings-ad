@@ -16,19 +16,20 @@
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-6",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6",
     "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5-20251001",
+    "TDD_GUARD_MODEL_VERSION": "claude-haiku-4-5-20251001",
     "CLAUDE_CODE_SUBAGENT_MODEL": "haiku",
     "MAX_THINKING_TOKENS": "10000",
     "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "50",
     "CLAUDE_AUTO_BACKGROUND_TASKS": "1",
-    "SERENA_MAX_MEMORY_FILES": "10",
-    "SERENA_MAX_MEMORY_LINES": "100"
+    "SERENA_MAX_MEMORY_FILES": "7",
+    "SERENA_MAX_MEMORY_LINES": "200"
   },
   "enabledPlugins": {
     "middlek-settings@middlek-settings": true,
     "superpowers@claude-plugins-official": true,
     "agent-deck@agent-deck": true,
-    "tdd-guard@tdd-guard": false,
-    "chorus@chorus-plugins": false,
+    "tdd-guard@tdd-guard": true,
+    "chorus@chorus-plugins": true,
     "codex@openai-codex": true
   },
   "extraKnownMarketplaces": {

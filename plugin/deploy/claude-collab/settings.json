@@ -20,13 +20,13 @@
     "MAX_THINKING_TOKENS": "10000",
     "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "50",
     "CLAUDE_AUTO_BACKGROUND_TASKS": "1",
-    "SERENA_MAX_MEMORY_FILES": "10",
-    "SERENA_MAX_MEMORY_LINES": "100"
+    "SERENA_MAX_MEMORY_FILES": "7",
+    "SERENA_MAX_MEMORY_LINES": "200"
   },
   "enabledPlugins": {
     "middlek-settings@middlek-settings": true,
     "superpowers@claude-plugins-official": true,
-    "agent-deck@agent-deck": false,
+    "agent-deck@agent-deck": true,
     "tdd-guard@tdd-guard": false,
     "chorus@chorus-plugins": true,
     "codex@openai-codex": true

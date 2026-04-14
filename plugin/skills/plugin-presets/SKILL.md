@@ -23,32 +23,16 @@ Manage Claude Code plugin combinations via preset profiles.
 
 ## Switching Presets
 
-### With agent-deck (recommended)
-
 ```bash
-# agent-deck Profiles 시스템 사용
 agent-deck             # default (solo) — ~/.claude 사용
-agent-deck -p tdd      # tdd preset — ~/.claude-tdd 사용
-agent-deck -p collab   # collab preset — ~/.claude-collab 사용
+agent-deck -p tdd      # tdd preset
+agent-deck -p collab   # collab preset
+agent-deck -p full     # full preset
+agent-deck -p minimal  # minimal preset
 ```
 
 agent-deck 프로필은 `~/.agent-deck/config.toml` 의 `[profiles.NAME.claude] config_dir` 로 설정됨.
 배포 파일은 `plugin/deploy/` 에 있으며, 검증 시 `install-to-home.sh` 로 복사한다.
-
-### Without agent-deck (project-local)
-
-```bash
-# .claude/settings.json 의 enabledPlugins + CLAUDE_CODE_SUBAGENT_MODEL 만 교체
-bash plugin/utils/switch-preset.sh solo
-bash plugin/utils/switch-preset.sh tdd
-bash plugin/utils/switch-preset.sh collab
-bash plugin/utils/switch-preset.sh full
-```
-
-현재 활성 프리셋 확인:
-```bash
-python3 -c "import json; d=json.load(open('.claude/settings.json')); print('plugins:', d.get('enabledPlugins')); print('subagent model:', d.get('env',{}).get('CLAUDE_CODE_SUBAGENT_MODEL'))"
-```
 
 ## Preset Workflows
 
@@ -65,7 +49,7 @@ python3 -c "import json; d=json.load(open('.claude/settings.json')); print('plug
 
 **요구사항:** Node.js/npx, ANTHROPIC_API_KEY
 
-1. `bash plugin/utils/switch-preset.sh tdd` (또는 `agent-deck -p tdd`)
+1. `agent-deck -p tdd`
 2. superpowers `test-driven-development` 스킬 → RED-GREEN-REFACTOR 원칙
 3. 편집 시도 → tdd-guard PreToolUse 가로채기
    - 실패 케이스 분석 → AI로 TDD 준수 여부 판정
@@ -81,7 +65,7 @@ python3 -c "import json; d=json.load(open('.claude/settings.json')); print('plug
 ```bash
 export CHORUS_URL=https://your-chorus-server
 export CHORUS_API_KEY=cho_your_key
-bash plugin/utils/switch-preset.sh collab  # 또는 agent-deck -p collab
+agent-deck -p collab
 ```
 
 워크플로우 (AI propose → human verify):
@@ -141,6 +125,4 @@ bash plugin/utils/restore-from-home.sh
 
 ## Preset Files
 
-모든 프리셋 정의: `plugin/presets/*.json`
-
-각 파일은 `preset`, `description`, `requires`, `enabledPlugins`, `env` 를 포함.
+모든 프리셋 정의: `plugin/deploy/claude-*/settings.json`
