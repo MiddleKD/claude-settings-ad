@@ -81,18 +81,37 @@ function main() {
   let memoriesExist = false;
   let memoryFileCount = 0;
   const oversizedFiles = []; // files exceeding line limit
+
+  function collectMdFiles(dir) {
+    const results = [];
+    try {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          results.push(...collectMdFiles(fullPath));
+        } else if (entry.isFile() && entry.name.endsWith('.md')) {
+          results.push(fullPath);
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return results;
+  }
+
   try {
     if (fs.existsSync(memoriesDir)) {
-      const mdFiles = fs.readdirSync(memoriesDir).filter(f => f.endsWith('.md'));
+      const mdFiles = collectMdFiles(memoriesDir);
       memoryFileCount = mdFiles.length;
       memoriesExist = memoryFileCount > 0;
 
-      for (const f of mdFiles) {
+      for (const fullPath of mdFiles) {
         try {
-          const content = fs.readFileSync(path.join(memoriesDir, f), 'utf8');
+          const content = fs.readFileSync(fullPath, 'utf8');
           const lineCount = content.split('\n').length;
           if (lineCount > MAX_MEMORY_LINES) {
-            oversizedFiles.push({ name: f.replace(/\.md$/, ''), lines: lineCount });
+            const rel = path.relative(memoriesDir, fullPath).replace(/\.md$/, '');
+            oversizedFiles.push({ name: rel, lines: lineCount });
           }
         } catch {
           // ignore
@@ -114,7 +133,7 @@ function main() {
   }
   lines.push('2. [load context] run mcp__serena__list_memories → restore project context');
   lines.push('3. [changes] quick-scan previous session data above — no deep investigation, screening only');
-  lines.push('4. [memory] if any of the following apply, run mcp__serena__write_memory:\n   - [ ] critical architecture decision / convention / trade-off\n   - [ ] new content not in memory\n   - [ ] contradicts existing memory');
+  lines.push('4. [memory] if ANY of the following apply, run mcp__serena__write_memory:\n   - [ ] architecture decision / convention / trade-off\n   - [ ] new content not in memory\n   - [ ] contradicts existing memory');
 
   // Add cleanup instruction if limits exceeded
   if (fileCountExceeded || oversizedFiles.length > 0) {
