@@ -32,6 +32,19 @@ function main() {
   const sessionDir = path.join(projectRoot, '.serena', 'session-data');
   const sessionFile = path.join(sessionDir, `${path.basename(projectRoot)}-session.json`);
 
+  // Auto-initialize .serena/project.yml from template if missing
+  const serenaDir = path.join(projectRoot, '.serena');
+  const projectYml = path.join(serenaDir, 'project.yml');
+  const templateYml = path.join(__dirname, '../../.serena/project.yml');
+  if (!fs.existsSync(projectYml) && fs.existsSync(templateYml)) {
+    try {
+      fs.mkdirSync(serenaDir, { recursive: true });
+      fs.copyFileSync(templateYml, projectYml);
+    } catch {
+      // ignore
+    }
+  }
+
   const lines = [];
 
   // Previous session state (only when file exists)
