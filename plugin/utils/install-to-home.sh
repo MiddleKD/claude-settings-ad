@@ -30,7 +30,7 @@ for preset in claude-tdd claude-collab claude-full claude-minimal; do
 done
 
 # 2. ~/.agent-deck/config.toml 패치
-echo "[2/2] ~/.agent-deck/config.toml 에 profiles 블록 추가..."
+echo "[2/3] ~/.agent-deck/config.toml 에 profiles 블록 추가..."
 if [ ! -f "$HOME/.agent-deck/config.toml" ]; then
   echo "      주의: ~/.agent-deck/config.toml 이 없습니다. agent-deck 를 먼저 설치하세요."
   echo "      profiles 블록 추가를 건너뜁니다."
@@ -42,6 +42,46 @@ else
     "$DEPLOY_DIR/agent-deck-config-patch.toml" \
     >> "$HOME/.agent-deck/config.toml"
   echo "      완료: profiles.tdd, collab, full, minimal 추가됨"
+fi
+
+# 3. ~/.codex/config.toml 패치
+echo "[3/3] ~/.codex/config.toml 에 codex 설정 추가..."
+mkdir -p "$HOME/.codex"
+if grep -q "BEGIN middlek-presets" "$HOME/.codex/config.toml" 2>/dev/null; then
+  echo "      이미 병합됨 — 건너뜁니다."
+else
+  PATCHED_CONTENT="$(sed "s|__PLUGIN_DIR__|$PLUGIN_DIR|g" "$DEPLOY_DIR/codex-config-patch.toml")"
+  python3 - "$HOME/.codex/config.toml" <<PYEOF
+import sys, os, re
+
+config_path = sys.argv[1]
+patch = """$PATCHED_CONTENT"""
+
+if os.path.exists(config_path):
+    with open(config_path, "r") as f:
+        content = f.read()
+else:
+    content = ""
+
+# 기존 top-level 키 값을 주석으로 백업
+backup_lines = []
+for key in ("model", "model_reasoning_effort"):
+    m = re.search(rf'(?m)^{key}\s*=.*', content)
+    if m:
+        backup_lines.append(f"# _backup_{key} = {m.group().split('=', 1)[1].strip()}")
+        content = re.sub(rf'(?m)^{key}\s*=.*\n?', '', content)
+
+# 백업 주석을 BEGIN 마커 바로 다음에 삽입
+patch_with_backup = patch.replace(
+    "# BEGIN middlek-presets",
+    "# BEGIN middlek-presets" + ("\n" + "\n".join(backup_lines) if backup_lines else "")
+)
+
+with open(config_path, "w") as f:
+    f.write(content.rstrip() + "\n\n" + patch_with_backup.strip() + "\n")
+
+print("      완료: model, model_reasoning_effort, projects trust_level 추가됨")
+PYEOF
 fi
 
 echo ""

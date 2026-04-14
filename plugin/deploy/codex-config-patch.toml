@@ -1,0 +1,13 @@
+# ~/.codex/config.toml 에 추가할 블록 템플릿
+# install-to-home.sh 가 __PLUGIN_DIR__ 을 실제 경로로 치환해 config.toml 에 병합한다.
+# restore-from-home.sh 가 이 블록을 제거한다.
+#
+# 마커 라인으로 구간을 식별하므로 수동 편집 시 마커를 보존해야 함.
+
+# BEGIN middlek-presets
+model = "gpt-5.3-codex"
+model_reasoning_effort = "medium"
+
+[projects."__PLUGIN_DIR__"]
+trust_level = "trusted"
+# END middlek-presets
