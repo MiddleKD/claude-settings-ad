@@ -76,14 +76,8 @@ else
   echo "      블록 없음 (건너뜀)"
 fi
 
-# 3. .generated/ 디렉토리 삭제
-echo "[3/3] plugin/deploy/.generated/ 삭제..."
-if [ -d "$DEPLOY_DIR/.generated" ]; then
-  rm -rf "$DEPLOY_DIR/.generated"
-  echo "      완료: .generated/ 삭제됨"
-else
-  echo "      없음 (건너뜀)"
-fi
-
 echo ""
 echo "=== 제거 완료 ==="
+echo ""
+echo "plugin/deploy/.generated/ 는 유지됩니다."
+echo "git pull 후 install-to-home.sh 를 실행하면 변경된 부분만 갱신됩니다."
