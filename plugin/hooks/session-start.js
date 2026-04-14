@@ -146,7 +146,7 @@ function main() {
   }
   lines.push('2. [load context] run mcp__serena__list_memories → restore project context');
   lines.push('3. [changes] quick-scan previous session data above — no deep investigation, screening only');
-  lines.push('4. [memory] if ANY of the following apply, run mcp__serena__write_memory:\n   - [ ] architecture decision / convention / trade-off\n   - [ ] new content not in memory\n   - [ ] contradicts existing memory');
+  lines.push('4. [memory] Check each item below. If ANY apply, run mcp__serena__write_memory:\n   - Did you make architectural decisions, establish conventions, or choose trade-offs?\n   - Did you discover important information not currently stored in memory?\n   - Did you find contradictions with existing memory content?\n   Note: This is a required check - memory updates preserve context for future sessions.');
 
   // Add cleanup instruction if limits exceeded
   if (fileCountExceeded || oversizedFiles.length > 0) {
