@@ -41,27 +41,21 @@ else
   echo "      블록 없음 (건너뜀)"
 fi
 
-# 2. ~/.agent-deck/skills/sources.toml 에서 middlek-presets 블록 제거
-echo "[2/3] ~/.agent-deck/skills/sources.toml 에서 middlek skill source 제거..."
-if [ ! -f "$HOME/.agent-deck/skills/sources.toml" ]; then
-  echo "      없음 (건너뜀)"
-elif grep -q "BEGIN middlek-presets" "$HOME/.agent-deck/skills/sources.toml" 2>/dev/null; then
-  python3 - <<'PYEOF'
-import re, os
-
-config_path = os.path.expanduser("~/.agent-deck/skills/sources.toml")
-with open(config_path, "r") as f:
-    content = f.read()
-
-cleaned = re.sub(r'\n*# BEGIN middlek-presets.*?# END middlek-presets\n?', '', content, flags=re.DOTALL)
-
-with open(config_path, "w") as f:
-    f.write(cleaned.rstrip() + "\n")
-
-print("      완료: middlek-presets 블록 제거됨")
-PYEOF
+# 2. ~/.agent-deck/skills/pool/ 에서 middlek 스킬 심링크 제거
+echo "[2/3] ~/.agent-deck/skills/pool/ 에서 middlek 스킬 심링크 제거..."
+POOL_DIR="$HOME/.agent-deck/skills/pool"
+SKILLS_SRC="$PLUGIN_DIR/plugin/skills"
+if [ -d "$POOL_DIR" ] && [ -d "$SKILLS_SRC" ]; then
+  for skill_dir in "$SKILLS_SRC"/*/; do
+    skill_name="$(basename "$skill_dir")"
+    link_target="$POOL_DIR/$skill_name"
+    if [ -L "$link_target" ]; then
+      rm "$link_target"
+      echo "      제거: pool/$skill_name"
+    fi
+  done
 else
-  echo "      블록 없음 (건너뜀)"
+  echo "      건너뜀 (pool 또는 skills 디렉토리 없음)"
 fi
 
 # 3. ~/.codex/config.toml 에서 middlek-presets 블록 제거 + 기존 값 복원
@@ -83,12 +77,15 @@ if block_m:
     for m in re.finditer(r'# _backup_(\w+) = (.+)', block_m.group()):
         restore_lines.append(f"{m.group(1)} = {m.group(2)}")
 
-# 블록 제거
+# BEGIN/END 블록 제거
 cleaned = re.sub(r'\n*# BEGIN middlek-presets.*?# END middlek-presets\n?', '', content, flags=re.DOTALL)
 
-# 기존 값 복원
+# patch 파일 헤더 주석 잔재 제거 (마커 없이 남겨진 경우 대비)
+cleaned = re.sub(r'\n*# ~/.codex/config\.toml 에 추가할 블록 템플릿.*?# 마커 라인으로 구간을 식별하므로 수동 편집 시 마커를 보존해야 함\.\n?', '', cleaned, flags=re.DOTALL)
+
+# 기존 값 복원: top-level 키이므로 파일 맨 앞에 삽입
 if restore_lines:
-    cleaned = cleaned.rstrip() + "\n" + "\n".join(restore_lines) + "\n"
+    cleaned = "\n".join(restore_lines) + "\n" + cleaned.lstrip()
 
 with open(config_path, "w") as f:
     f.write(cleaned.rstrip() + "\n")
