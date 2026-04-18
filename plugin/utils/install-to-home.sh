@@ -19,14 +19,40 @@ echo "=== install-to-home.sh: agent-deck 프로필 설치 ==="
 echo "PLUGIN_DIR: $PLUGIN_DIR"
 echo ""
 
-# 1. .generated/ 에 settings.json 생성 (플레이스홀더 치환)
+# 1. .generated/ 에 settings.json 생성 (플레이스홀더 치환 + hooks.json 병합)
 echo "[1/2] .generated/ 디렉토리에 settings.json 생성..."
 for preset in claude-tdd claude-collab claude-full claude-minimal; do
   mkdir -p "$DEPLOY_DIR/.generated/$preset"
-  sed "s|__PLUGIN_DIR__|$PLUGIN_DIR|g" \
-    "$DEPLOY_DIR/$preset/settings.json" \
-    > "$DEPLOY_DIR/.generated/$preset/settings.json"
-  echo "      생성: plugin/deploy/.generated/$preset/settings.json"
+  python3 - "$DEPLOY_DIR/$preset" "$DEPLOY_DIR/.generated/$preset" "$PLUGIN_DIR" <<'PYEOF'
+import sys, json, re
+
+src_dir, dst_dir, plugin_dir = sys.argv[1], sys.argv[2], sys.argv[3]
+
+def replace(text):
+    return text.replace("__PLUGIN_DIR__", plugin_dir)
+
+with open(f"{src_dir}/settings.json") as f:
+    settings = json.loads(replace(f.read()))
+
+hooks_path = f"{src_dir}/hooks.json"
+try:
+    with open(hooks_path) as f:
+        hooks_data = json.loads(replace(f.read()))
+    if hooks_data.get("hooks"):
+        existing = settings.get("hooks", {})
+        for event, matchers in hooks_data["hooks"].items():
+            existing.setdefault(event, []).extend(matchers)
+        settings["hooks"] = existing
+except FileNotFoundError:
+    pass
+
+with open(f"{dst_dir}/settings.json", "w") as f:
+    json.dump(settings, f, indent=2, ensure_ascii=False)
+    f.write("\n")
+PYEOF
+  hooks_note=""
+  [ -f "$DEPLOY_DIR/$preset/hooks.json" ] && hooks_note=" (hooks.json 병합됨)"
+  echo "      생성: plugin/deploy/.generated/$preset/settings.json$hooks_note"
 done
 
 # 2. ~/.agent-deck/config.toml 패치
