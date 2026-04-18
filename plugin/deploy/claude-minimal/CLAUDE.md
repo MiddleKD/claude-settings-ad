@@ -1,2 +1,0 @@
-# Minimal Profile Instructions
-
