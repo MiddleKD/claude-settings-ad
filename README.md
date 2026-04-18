@@ -12,14 +12,17 @@ git clone https://github.com/MiddleKD/claude-settings-ad.git ~/.claude/$(whoami)
 bash ~/.claude/$(whoami)_settings/plugin/utils/restore-from-home.sh && rm -rf ~/.claude/$(whoami)_settings
 ```
 
-install 스크립트가 `plugin/deploy/.generated/` 에 경로가 치환된 settings.json을 생성하고,
-`~/.agent-deck/config.toml` 에 profiles 블록을 추가한다.
+install 스크립트가 하는 일:
+- `plugin/deploy/.generated/` 에 경로가 치환된 settings.json 생성
+- `~/.agent-deck/config.toml` 에 profiles 블록 추가
+- `~/.agent-deck/skills/pool/` 에 middlek 스킬 심링크 생성
+- `~/.codex/config.toml` 에 model 설정 추가
 
 ## 구조
 
 ```
-.claude/
-└── settings.json          # Claude Code 전역 설정 (extraKnownMarketplaces, enabledPlugins)
+.claude-plugin/
+└── marketplace.json       # middlek-settings 마켓플레이스 정의
 
 plugin/                    # middlek 플러그인 (항상 활성)
 ├── hooks/                 # 훅 정의 + 훅 실행 스크립트 (JS)
@@ -29,11 +32,16 @@ plugin/                    # middlek 플러그인 (항상 활성)
 │   ├── session-end.js
 │   └── pre-compact.js
 ├── utils/                 # 독립 실행 유틸리티 (sh)
-│   ├── install-to-home.sh # 검증용 홈 배포
+│   ├── install-to-home.sh
 │   └── restore-from-home.sh
 ├── deploy/                # 홈 디렉토리 배포 대상 파일 (source of truth)
+│   ├── claude-tdd/settings.json
+│   ├── claude-collab/settings.json
+│   ├── claude-full/settings.json
+│   ├── claude-minimal/settings.json
+│   ├── agent-deck-config-patch.toml
+│   └── codex-config-patch.toml
 └── skills/plugin-presets/ # 프리셋 사용 가이드 스킬
-
 ```
 
 ## 플러그인 프리셋

@@ -44,23 +44,24 @@ else
   echo "      완료: profiles.tdd, collab, full, minimal 추가됨"
 fi
 
-# 3. ~/.agent-deck/skills/sources.toml 패치
-echo "[3/4] ~/.agent-deck/skills/sources.toml 에 middlek skill source 추가..."
-if [ ! -f "$HOME/.agent-deck/config.toml" ]; then
-  echo "      주의: ~/.agent-deck/config.toml 이 없습니다. agent-deck 를 먼저 설치하세요."
-  echo "      skill source 추가를 건너뜁니다."
+# 3. ~/.agent-deck/skills/pool/ 에 middlek 스킬 심링크 생성
+echo "[3/4] ~/.agent-deck/skills/pool/ 에 middlek 스킬 심링크 추가..."
+POOL_DIR="$HOME/.agent-deck/skills/pool"
+if [ -d "$POOL_DIR" ]; then
+  for skill_dir in "$PLUGIN_DIR/plugin/skills"/*/; do
+    skill_name="$(basename "$skill_dir")"
+    link_target="$POOL_DIR/$skill_name"
+    if [ -L "$link_target" ]; then
+      echo "      이미 있음: pool/$skill_name (건너뜀)"
+    elif [ -e "$link_target" ]; then
+      echo "      경고: pool/$skill_name 이 이미 존재함 (실제 파일, 건너뜀)"
+    else
+      ln -sf "$skill_dir" "$link_target"
+      echo "      심링크 생성: pool/$skill_name -> $skill_dir"
+    fi
+  done
 else
-  mkdir -p "$HOME/.agent-deck/skills"
-  if grep -q "BEGIN middlek-presets" "$HOME/.agent-deck/skills/sources.toml" 2>/dev/null; then
-    echo "      이미 병합됨 — 건너뜁니다."
-  else
-    SKILLS_TOML="$HOME/.agent-deck/skills/sources.toml"
-    [ -s "$SKILLS_TOML" ] && echo "" >> "$SKILLS_TOML"
-    sed "s|__PLUGIN_DIR__|$PLUGIN_DIR|g" \
-      "$DEPLOY_DIR/agent-deck-skills-patch.toml" \
-      >> "$SKILLS_TOML"
-    echo "      완료: sources.middlek 추가됨"
-  fi
+  echo "      주의: $POOL_DIR 없음 — agent-deck 먼저 실행해주세요."
 fi
 
 # 4. ~/.codex/config.toml 패치
@@ -69,12 +70,18 @@ mkdir -p "$HOME/.codex"
 if grep -q "BEGIN middlek-presets" "$HOME/.codex/config.toml" 2>/dev/null; then
   echo "      이미 병합됨 — 건너뜁니다."
 else
-  PATCHED_CONTENT="$(sed "s|__PLUGIN_DIR__|$PLUGIN_DIR|g" "$DEPLOY_DIR/codex-config-patch.toml")"
-  python3 - "$HOME/.codex/config.toml" <<PYEOF
+  python3 - "$HOME/.codex/config.toml" "$DEPLOY_DIR/codex-config-patch.toml" "$PLUGIN_DIR" <<'PYEOF'
 import sys, os, re
 
-config_path = sys.argv[1]
-patch = """$PATCHED_CONTENT"""
+config_path, patch_path, plugin_dir = sys.argv[1], sys.argv[2], sys.argv[3]
+
+# patch 파일을 직접 읽고 플레이스홀더 치환
+with open(patch_path, "r") as f:
+    patch_full = f.read().replace("__PLUGIN_DIR__", plugin_dir)
+
+# BEGIN~END 블록만 추출 (파일 헤더 주석 제외)
+m = re.search(r'(# BEGIN middlek-presets.*?# END middlek-presets)', patch_full, flags=re.DOTALL)
+patch = m.group(1) if m else patch_full.strip()
 
 if os.path.exists(config_path):
     with open(config_path, "r") as f:
@@ -82,7 +89,7 @@ if os.path.exists(config_path):
 else:
     content = ""
 
-# 기존 top-level 키 값을 주석으로 백업
+# 기존 top-level 키 값을 주석으로 백업 (^key= 만 매칭, model_provider 등 오매칭 방지)
 backup_lines = []
 for key in ("model", "model_reasoning_effort"):
     m = re.search(rf'(?m)^{key}\s*=.*', content)
