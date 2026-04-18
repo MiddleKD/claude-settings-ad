@@ -11,7 +11,12 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { execSync } = require('child_process');
+
+function sha256(content) {
+  return crypto.createHash('sha256').update(content).digest('hex');
+}
 
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
@@ -46,6 +51,39 @@ function main() {
   }
 
   const lines = [];
+
+  // Profile CLAUDE.md — copy to project's .claude/CLAUDE.md
+  let profileCopied = false;
+  let profileUserModified = false;
+  const profile = process.env.CLAUDE_PROFILE;
+  if (profile) {
+    const src = path.join(__dirname, '../deploy', `claude-${profile}`, 'CLAUDE.md');
+    if (fs.existsSync(src)) {
+      const srcContent = fs.readFileSync(src, 'utf8');
+      const srcHash = sha256(srcContent);
+      const destDir = path.join(projectRoot, '.claude');
+      const dest = path.join(destDir, 'CLAUDE.md');
+      const hashFile = path.join(destDir, '.profile-claude-md.sha');
+
+      let destHash = null;
+      try { destHash = sha256(fs.readFileSync(dest, 'utf8')); } catch { /* not yet */ }
+      let savedHash = null;
+      try { savedHash = fs.readFileSync(hashFile, 'utf8').trim(); } catch { /* not yet */ }
+
+      if (srcHash === destHash) {
+        // up to date, nothing to do
+      } else if (destHash === null || savedHash === null || savedHash === destHash) {
+        // dest missing OR no tracking record (sha deleted = force) OR unmodified since last copy → safe to overwrite
+        fs.mkdirSync(destDir, { recursive: true });
+        fs.writeFileSync(dest, srcContent, 'utf8');
+        fs.writeFileSync(hashFile, srcHash, 'utf8');
+        profileCopied = true;
+      } else {
+        // user modified the file → skip, warn
+        profileUserModified = true;
+      }
+    }
+  }
 
   // Previous session state (only when file exists)
   let state = null;
@@ -163,8 +201,14 @@ function main() {
 
   const additionalContext = lines.join('\n');
 
+  const systemMessage = profileCopied
+    ? `🚀 Prepare session... ⚠️ Profile CLAUDE.md updated (${profile}) — takes effect from NEXT session`
+    : profileUserModified
+      ? `🚀 Prepare session... ⚠️ Profile CLAUDE.md (${profile}) skipped — local .claude/CLAUDE.md has user modifications`
+      : '🚀 Prepare session...';
+
   const output = {
-    systemMessage: '🚀 Prepare session...',
+    systemMessage,
     hookSpecificOutput: {
       hookEventName: 'SessionStart',
       additionalContext,

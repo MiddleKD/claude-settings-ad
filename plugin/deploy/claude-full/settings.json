@@ -23,7 +23,8 @@
     "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "50",
     "CLAUDE_AUTO_BACKGROUND_TASKS": "1",
     "SERENA_MAX_MEMORY_FILES": "7",
-    "SERENA_MAX_MEMORY_LINES": "200"
+    "SERENA_MAX_MEMORY_LINES": "200",
+    "CLAUDE_PROFILE": "full"
   },
   "enabledPlugins": {
     "middlek-settings@middlek-settings": true,
