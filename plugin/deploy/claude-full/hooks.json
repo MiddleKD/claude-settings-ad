@@ -1,4 +1,15 @@
 {
   "hooks": {
+      "PreToolUse": [
+      {
+        "matcher": "chorus_claim_task|chorus_submit_for_verify",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/check-chorus-notifications.py\""
+          }
+        ]
+      }
+    ]
   }
 }

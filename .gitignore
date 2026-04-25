@@ -14,3 +14,5 @@ claude-settings-session.json
 .serena/session-data
 .serena/.gitignore
 plugin/deploy/.generated/
+.claude/CLAUDE.md
+.claude/.profile-claude-md.sha
