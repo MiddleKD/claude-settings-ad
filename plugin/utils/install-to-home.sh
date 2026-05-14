@@ -20,7 +20,7 @@ echo "PLUGIN_DIR: $PLUGIN_DIR"
 echo ""
 
 # 1. .generated/ 에 settings.json 생성 (플레이스홀더 치환 + hooks.json 병합)
-echo "[1/2] .generated/ 디렉토리에 settings.json 생성..."
+echo "[1/6] .generated/ 디렉토리에 Claude settings.json 생성..."
 for preset in claude-tdd claude-collab claude-full claude-minimal; do
   mkdir -p "$DEPLOY_DIR/.generated/$preset"
   python3 - "$DEPLOY_DIR/$preset" "$DEPLOY_DIR/.generated/$preset" "$PLUGIN_DIR" <<'PYEOF'
@@ -56,7 +56,7 @@ PYEOF
 done
 
 # 2. ~/.agent-deck/config.toml 패치
-echo "[2/4] ~/.agent-deck/config.toml 에 profiles 블록 추가..."
+echo "[2/6] ~/.agent-deck/config.toml 에 profiles 블록 추가..."
 if [ ! -f "$HOME/.agent-deck/config.toml" ]; then
   echo "      주의: ~/.agent-deck/config.toml 이 없습니다. agent-deck 를 먼저 설치하세요."
   echo "      profiles 블록 추가를 건너뜁니다."
@@ -71,7 +71,7 @@ else
 fi
 
 # 3. ~/.agent-deck/skills/pool/ 에 middlek 스킬 심링크 생성
-echo "[3/4] ~/.agent-deck/skills/pool/ 에 middlek 스킬 심링크 추가..."
+echo "[3/6] ~/.agent-deck/skills/pool/ 에 middlek 스킬 심링크 추가..."
 POOL_DIR="$HOME/.agent-deck/skills/pool"
 if [ -d "$POOL_DIR" ]; then
   for skill_dir in "$PLUGIN_DIR/plugin/skills"/*/; do
@@ -91,7 +91,7 @@ else
 fi
 
 # 4. ~/.codex/config.toml 패치
-echo "[4/4] ~/.codex/config.toml 에 codex 설정 추가..."
+echo "[4/6] ~/.codex/config.toml 에 codex 설정 추가..."
 mkdir -p "$HOME/.codex"
 if grep -q "BEGIN middlek-presets" "$HOME/.codex/config.toml" 2>/dev/null; then
   echo "      이미 병합됨 — 건너뜁니다."
@@ -135,6 +135,61 @@ with open(config_path, "w") as f:
 print("      완료: model, model_reasoning_effort, projects trust_level 추가됨")
 PYEOF
 fi
+
+# 5. .generated/ 에 Codex preset config.toml + hooks.json + AGENT.md 생성
+echo "[5/6] .generated/ 디렉토리에 Codex preset 파일 생성..."
+for preset in codex-tdd codex-collab codex-full codex-minimal; do
+  mkdir -p "$DEPLOY_DIR/.generated/$preset"
+  python3 - "$DEPLOY_DIR/$preset" "$DEPLOY_DIR/.generated/$preset" "$PLUGIN_DIR" <<'PYEOF'
+import sys, os
+
+src_dir, dst_dir, plugin_dir = sys.argv[1], sys.argv[2], sys.argv[3]
+
+def replace(text):
+    return text.replace("__PLUGIN_DIR__", plugin_dir)
+
+for fname in ("config.toml", "hooks.json", "AGENT.md"):
+    src = f"{src_dir}/{fname}"
+    if not os.path.exists(src):
+        continue
+    with open(src) as f:
+        content = replace(f.read())
+    with open(f"{dst_dir}/{fname}", "w") as f:
+        f.write(content)
+PYEOF
+  echo "      생성: plugin/deploy/.generated/$preset/"
+done
+
+# 6. ~/.codex/hooks.json 배포 (solo 모드 전역 훅)
+echo "[6/6] ~/.codex/hooks.json 배포 (solo 모드 전역 훅)..."
+mkdir -p "$HOME/.codex"
+python3 - "$DEPLOY_DIR/codex-tdd/hooks.json" "$HOME/.codex/hooks.json" "$PLUGIN_DIR" <<'PYEOF'
+import sys, json, os, shutil
+
+src, dst, plugin_dir = sys.argv[1], sys.argv[2], sys.argv[3]
+
+if os.path.exists(dst):
+    try:
+        with open(dst) as f:
+            existing = json.load(f)
+        if existing.get("_middlek_managed"):
+            print("      이미 middlek 관리 파일 — 덮어씁니다.")
+        else:
+            shutil.copy(dst, dst + ".bak")
+            print(f"      기존 파일 백업: {dst}.bak")
+    except Exception:
+        shutil.copy(dst, dst + ".bak")
+        print(f"      기존 파일 백업: {dst}.bak")
+
+with open(src) as f:
+    content = f.read().replace("__PLUGIN_DIR__", plugin_dir)
+data = json.loads(content)
+data["_middlek_managed"] = True
+with open(dst, "w") as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+    f.write("\n")
+print(f"      완료: {dst}")
+PYEOF
 
 echo ""
 echo "=== 설치 완료 ==="

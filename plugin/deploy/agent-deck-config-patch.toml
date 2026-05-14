@@ -20,4 +20,16 @@ config_dir = "__PLUGIN_DIR__/plugin/deploy/.generated/claude-full"
 
 [profiles.minimal.claude]
 config_dir = "__PLUGIN_DIR__/plugin/deploy/.generated/claude-minimal"
+
+[profiles.tdd.codex]
+config_dir = "__PLUGIN_DIR__/plugin/deploy/.generated/codex-tdd"
+
+[profiles.collab.codex]
+config_dir = "__PLUGIN_DIR__/plugin/deploy/.generated/codex-collab"
+
+[profiles.full.codex]
+config_dir = "__PLUGIN_DIR__/plugin/deploy/.generated/codex-full"
+
+[profiles.minimal.codex]
+config_dir = "__PLUGIN_DIR__/plugin/deploy/.generated/codex-minimal"
 # END middlek-presets

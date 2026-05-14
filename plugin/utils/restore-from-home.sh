@@ -19,7 +19,7 @@ echo "=== restore-from-home.sh: agent-deck 프로필 제거 ==="
 echo ""
 
 # 1. ~/.agent-deck/config.toml 에서 middlek-presets 블록 제거
-echo "[1/2] ~/.agent-deck/config.toml 에서 middlek-presets 블록 제거..."
+echo "[1/5] ~/.agent-deck/config.toml 에서 middlek-presets 블록 제거..."
 if [ ! -f "$HOME/.agent-deck/config.toml" ]; then
   echo "      없음 (건너뜀)"
 elif grep -q "BEGIN middlek-presets" "$HOME/.agent-deck/config.toml" 2>/dev/null; then
@@ -42,7 +42,7 @@ else
 fi
 
 # 2. ~/.agent-deck/skills/pool/ 에서 middlek 스킬 심링크 제거
-echo "[2/3] ~/.agent-deck/skills/pool/ 에서 middlek 스킬 심링크 제거..."
+echo "[2/5] ~/.agent-deck/skills/pool/ 에서 middlek 스킬 심링크 제거..."
 POOL_DIR="$HOME/.agent-deck/skills/pool"
 SKILLS_SRC="$PLUGIN_DIR/plugin/skills"
 if [ -d "$POOL_DIR" ] && [ -d "$SKILLS_SRC" ]; then
@@ -59,7 +59,7 @@ else
 fi
 
 # 3. ~/.codex/config.toml 에서 middlek-presets 블록 제거 + 기존 값 복원
-echo "[3/3] ~/.codex/config.toml 에서 middlek-presets 블록 제거..."
+echo "[3/5] ~/.codex/config.toml 에서 middlek-presets 블록 제거..."
 if [ ! -f "$HOME/.codex/config.toml" ]; then
   echo "      없음 (건너뜀)"
 elif grep -q "BEGIN middlek-presets" "$HOME/.codex/config.toml" 2>/dev/null; then
@@ -96,8 +96,48 @@ else
   echo "      블록 없음 (건너뜀)"
 fi
 
+# 4. ~/.codex/hooks.json 제거 (백업 있으면 복원)
+echo "[4/5] ~/.codex/hooks.json 제거..."
+CODEX_HOOKS="$HOME/.codex/hooks.json"
+if [ ! -f "$CODEX_HOOKS" ]; then
+  echo "      없음 (건너뜀)"
+else
+  python3 - "$CODEX_HOOKS" <<'PYEOF'
+import sys, json, os, shutil
+
+hooks_path = sys.argv[1]
+bak_path = hooks_path + ".bak"
+
+try:
+    with open(hooks_path) as f:
+        data = json.load(f)
+    managed = data.get("_middlek_managed", False)
+except Exception:
+    managed = False
+
+if os.path.exists(bak_path):
+    shutil.move(bak_path, hooks_path)
+    print(f"      복원: {bak_path} → {hooks_path}")
+elif managed:
+    os.remove(hooks_path)
+    print(f"      삭제: {hooks_path}")
+else:
+    print("      middlek 관리 파일 아님 — 건너뜀")
+PYEOF
+fi
+
+# 5. .generated/codex-*/ 디렉토리 제거
+echo "[5/5] .generated/codex-*/ 디렉토리 제거..."
+for preset in codex-tdd codex-collab codex-full codex-minimal; do
+  target="$DEPLOY_DIR/.generated/$preset"
+  if [ -d "$target" ]; then
+    rm -rf "$target"
+    echo "      제거: plugin/deploy/.generated/$preset/"
+  fi
+done
+
 echo ""
 echo "=== 제거 완료 ==="
 echo ""
-echo "plugin/deploy/.generated/ 는 유지됩니다."
+echo "plugin/deploy/.generated/claude-*/ 는 유지됩니다."
 echo "git pull 후 install-to-home.sh 를 실행하면 변경된 부분만 갱신됩니다."
