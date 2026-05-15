@@ -10,6 +10,7 @@
  */
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const { execSync } = require('child_process');
@@ -51,6 +52,30 @@ function main() {
   }
 
   const lines = [];
+
+  // Profile AGENTS.md — copy to ~/.codex/AGENTS.md for Codex
+  const codexProfile = process.env.CODEX_PROFILE;
+  if (codexProfile) {
+    const src = path.join(__dirname, '../deploy', `codex-${codexProfile}`, 'AGENT.md');
+    if (fs.existsSync(src)) {
+      const srcContent = fs.readFileSync(src, 'utf8');
+      const srcHash = sha256(srcContent);
+      const destDir = path.join(os.homedir(), '.codex');
+      const dest = path.join(destDir, 'AGENTS.md');
+      const hashFile = path.join(destDir, '.profile-agents-md.sha');
+      let destHash = null;
+      try { destHash = sha256(fs.readFileSync(dest, 'utf8')); } catch { /* not yet */ }
+      let savedHash = null;
+      try { savedHash = fs.readFileSync(hashFile, 'utf8').trim(); } catch { /* not yet */ }
+      if (srcHash !== destHash) {
+        if (destHash === null || savedHash === null || savedHash === destHash) {
+          fs.mkdirSync(destDir, { recursive: true });
+          fs.writeFileSync(dest, srcContent, 'utf8');
+          fs.writeFileSync(hashFile, srcHash, 'utf8');
+        }
+      }
+    }
+  }
 
   // Profile CLAUDE.md — copy to project's .claude/CLAUDE.md
   let profileCopied = false;

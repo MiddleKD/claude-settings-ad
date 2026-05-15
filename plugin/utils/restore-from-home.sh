@@ -136,6 +136,17 @@ for preset in codex-tdd codex-collab codex-full codex-minimal; do
   fi
 done
 
+# 6. ~/.codex/AGENTS.md 제거 (middlek 관리 파일)
+echo "[6/6] ~/.codex/AGENTS.md 제거..."
+CODEX_AGENTS="$HOME/.codex/AGENTS.md"
+CODEX_AGENTS_HASH="$HOME/.codex/.profile-agents-md.sha"
+if [ -f "$CODEX_AGENTS_HASH" ]; then
+  rm -f "$CODEX_AGENTS" "$CODEX_AGENTS_HASH"
+  echo "      삭제: ~/.codex/AGENTS.md"
+else
+  echo "      없음 (건너뜀)"
+fi
+
 echo ""
 echo "=== 제거 완료 ==="
 echo ""

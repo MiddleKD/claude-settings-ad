@@ -1,0 +1,13 @@
+{
+  "name": "middlek-settings",
+  "owner": { "name": "middlek" },
+  "plugins": [
+    {
+      "name": "middlek-settings",
+      "source": { "source": "local", "path": "." },
+      "description": "Personal Codex hooks and settings",
+      "category": "productivity",
+      "policy": { "installation": "manual" }
+    }
+  ]
+}

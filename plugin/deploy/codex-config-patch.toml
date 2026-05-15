@@ -17,4 +17,23 @@ trust_level = "trusted"
 [mcp_servers.serena]
 command = "uvx"
 args = ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server"]
-# END middlek-presets
+
+[marketplaces.middlek-settings]
+source_type = "local"
+source = "__PLUGIN_DIR__"
+last_updated = "2026-05-15T00:00:00Z"
+
+[marketplaces.agent-deck]
+source_type = "git"
+source = "https://github.com/asheshgoplani/agent-deck.git"
+last_updated = "2026-05-15T00:00:00Z"
+
+[marketplaces.tdd-guard]
+source_type = "git"
+source = "https://github.com/nizos/tdd-guard.git"
+last_updated = "2026-05-15T00:00:00Z"
+
+[marketplaces.chorus-plugins]
+source_type = "git"
+source = "https://github.com/Chorus-AIDLC/Chorus.git"
+last_updated = "2026-05-15T00:00:00Z"

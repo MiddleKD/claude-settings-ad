@@ -1,12 +1,17 @@
-# Full Stack Workflow
+# Agent 실행 원칙
 
-Full local stack with Serena code intelligence.
+`Agent()` 호출은 항상 `run_in_background: true`. 완료 알림 후 결과 처리.
 
-**Serena MCP is available** — use `mcp__serena__find_symbol`, `mcp__serena__get_symbols_overview` for code navigation and `mcp__serena__write_memory` to persist architectural decisions.
+# 핵심 원칙
+
+- 코드 탐색은 `find_symbol`, `get_symbols_overview` 등 Serena 심볼 툴 우선 사용
+- 중요 작업 완료 후 새로 파악한 아키텍처/컨벤션은 `write_memory`로 업데이트
 
 ---
 
 # Working Guideline
+
+Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
@@ -30,6 +35,8 @@ Before implementing:
 - No error handling for impossible scenarios.
 - If you write 200 lines and it could be 50, rewrite it.
 
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
 ## 3. Surgical Changes
 
 **Touch only what you must. Clean up only your own mess.**
@@ -38,6 +45,13 @@ When editing existing code:
 - Don't "improve" adjacent code, comments, or formatting.
 - Don't refactor things that aren't broken.
 - Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
 
 ## 4. Goal-Driven Execution
 
@@ -46,3 +60,17 @@ When editing existing code:
 Transform tasks into verifiable goals:
 - "Add validation" → "Write tests for invalid inputs, then make them pass"
 - "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+---
+
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.

@@ -1,5 +1,10 @@
 model = "gpt-5.3-codex"
 model_reasoning_effort = "medium"
+approval_policy = "never"
+
+[shell_environment_policy]
+inherit = "core"
+set = { CODEX_PROFILE = "full" }
 
 [features]
 codex_hooks = true
@@ -10,3 +15,15 @@ trust_level = "trusted"
 [mcp_servers.serena]
 command = "uvx"
 args = ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server"]
+
+[plugins."middlek-settings@middlek-settings"]
+enabled = true
+
+[plugins."agent-deck@agent-deck"]
+enabled = true
+
+[plugins."tdd-guard@tdd-guard"]
+enabled = true
+
+[plugins."chorus@chorus-plugins"]
+enabled = true

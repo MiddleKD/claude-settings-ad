@@ -1,35 +1,8 @@
-# Minimal Workflow
+# Agent 실행 원칙
 
-Fast, token-efficient mode. Get to the solution directly.
+`Agent()` 호출은 항상 `run_in_background: true`. 완료 알림 후 결과 처리.
 
-**Serena MCP is available** for code navigation when needed.
+# 핵심 원칙
 
----
-
-# Working Guideline
-
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
-
-## 1. Think Before Coding
-
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
-
-Before implementing:
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
-
-## 2. Simplicity First
-
-**Minimum code that solves the problem. Nothing speculative.**
-
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- If you write 200 lines and it could be 50, rewrite it.
-
-## 3. Surgical Changes
-
-**Touch only what you must. Clean up only your own mess.**
-
-## 4. Goal-Driven Execution
-
-**Define success criteria. Loop until verified.**
+- 코드 탐색은 `find_symbol`, `get_symbols_overview` 등 Serena 심볼 툴 우선 사용
+- 중요 작업 완료 후 새로 파악한 아키텍처/컨벤션은 `write_memory`로 업데이트
