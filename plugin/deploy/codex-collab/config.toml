@@ -7,7 +7,13 @@ inherit = "core"
 set = { CODEX_PROFILE = "collab" }
 
 [features]
-codex_hooks = true
+hooks = true
+
+[hooks.state."__PLUGIN_DIR__/plugin/deploy/.generated/codex-collab/hooks.json:session_start:0:0"]
+enabled = true
+
+[hooks.state."__PLUGIN_DIR__/plugin/deploy/.generated/codex-collab/hooks.json:stop:0:0"]
+enabled = true
 
 [projects."__PLUGIN_DIR__"]
 trust_level = "trusted"

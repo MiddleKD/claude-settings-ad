@@ -9,7 +9,7 @@ model = "gpt-5.3-codex"
 model_reasoning_effort = "medium"
 
 [features]
-codex_hooks = true
+hooks = true
 
 [projects."__PLUGIN_DIR__"]
 trust_level = "trusted"

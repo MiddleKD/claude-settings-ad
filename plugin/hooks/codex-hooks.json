@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node __PLUGIN_DIR__/plugin/hooks/session-start-bootstrap.js",
+            "command": "node \"__PLUGIN_DIR__/plugin/hooks/session-start-bootstrap.js\"",
             "timeout": 30
           }
         ]
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node __PLUGIN_DIR__/plugin/hooks/codex-stop.js",
+            "command": "node \"__PLUGIN_DIR__/plugin/hooks/codex-stop.js\"",
             "timeout": 10
           }
         ]

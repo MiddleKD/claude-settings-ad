@@ -10,7 +10,6 @@
  */
 
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const { execSync } = require('child_process');
@@ -53,26 +52,34 @@ function main() {
 
   const lines = [];
 
-  // Profile AGENTS.md — copy to ~/.codex/AGENTS.md for Codex
+  // Profile AGENT.md — copy to {projectRoot}/.codex/AGENT.md per project (like CLAUDE.md logic)
+  let agentsCopied = false;
+  let agentsUserModified = false;
   const codexProfile = process.env.CODEX_PROFILE;
   if (codexProfile) {
     const src = path.join(__dirname, '../deploy', `codex-${codexProfile}`, 'AGENT.md');
     if (fs.existsSync(src)) {
       const srcContent = fs.readFileSync(src, 'utf8');
       const srcHash = sha256(srcContent);
-      const destDir = path.join(os.homedir(), '.codex');
-      const dest = path.join(destDir, 'AGENTS.md');
-      const hashFile = path.join(destDir, '.profile-agents-md.sha');
+      const hashDir = path.join(projectRoot, '.codex');
+      const dest = path.join(hashDir, 'AGENT.md');
+      const hashFile = path.join(hashDir, '.profile-agents-md.sha');
+
       let destHash = null;
       try { destHash = sha256(fs.readFileSync(dest, 'utf8')); } catch { /* not yet */ }
       let savedHash = null;
       try { savedHash = fs.readFileSync(hashFile, 'utf8').trim(); } catch { /* not yet */ }
-      if (srcHash !== destHash) {
-        if (destHash === null || savedHash === null || savedHash === destHash) {
-          fs.mkdirSync(destDir, { recursive: true });
-          fs.writeFileSync(dest, srcContent, 'utf8');
-          fs.writeFileSync(hashFile, srcHash, 'utf8');
-        }
+
+      if (srcHash === destHash) {
+        // up to date, nothing to do
+      } else if (destHash === null || savedHash === null || savedHash === destHash) {
+        fs.mkdirSync(hashDir, { recursive: true });
+        fs.writeFileSync(dest, srcContent, 'utf8');
+        fs.writeFileSync(hashFile, srcHash, 'utf8');
+        agentsCopied = true;
+      } else {
+        // user modified the file → skip, warn
+        agentsUserModified = true;
       }
     }
   }
@@ -226,11 +233,14 @@ function main() {
 
   const additionalContext = lines.join('\n');
 
-  const systemMessage = profileCopied
-    ? `🚀 Prepare session... ⚠️ Profile CLAUDE.md updated (${profile}) — takes effect from NEXT session`
-    : profileUserModified
-      ? `🚀 Prepare session... ⚠️ Profile CLAUDE.md (${profile}) skipped — local .claude/CLAUDE.md has user modifications`
-      : '🚀 Prepare session...';
+  const notices = [];
+  if (profileCopied) notices.push(`Profile CLAUDE.md updated (${profile}) — takes effect from NEXT session`);
+  if (profileUserModified) notices.push(`Profile CLAUDE.md (${profile}) skipped — local .claude/CLAUDE.md has user modifications`);
+  if (agentsCopied) notices.push(`Profile AGENT.md updated (${codexProfile}) at .codex/AGENT.md — takes effect from NEXT session`);
+  if (agentsUserModified) notices.push(`Profile AGENT.md (${codexProfile}) skipped — local .codex/AGENT.md has user modifications`);
+  const systemMessage = notices.length > 0
+    ? `🚀 Prepare session... ⚠️ ${notices.join(' / ')}`
+    : '🚀 Prepare session...';
 
   const output = {
     systemMessage,

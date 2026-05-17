@@ -140,22 +140,87 @@ fi
 echo "[5/6] .generated/ 디렉토리에 Codex preset 파일 생성..."
 for preset in codex-tdd codex-collab codex-full codex-minimal; do
   mkdir -p "$DEPLOY_DIR/.generated/$preset"
-  python3 - "$DEPLOY_DIR/$preset" "$DEPLOY_DIR/.generated/$preset" "$PLUGIN_DIR" <<'PYEOF'
-import sys, os
+  python3 - "$DEPLOY_DIR/$preset" "$DEPLOY_DIR/.generated/$preset" "$PLUGIN_DIR" "$HOME" <<'PYEOF'
+import sys, os, re, json
 
-src_dir, dst_dir, plugin_dir = sys.argv[1], sys.argv[2], sys.argv[3]
+src_dir, dst_dir, plugin_dir, home_dir = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+
+# profile name: "codex-minimal" -> "minimal"
+profile_name = os.path.basename(src_dir)[len("codex-"):]
 
 def replace(text):
-    return text.replace("__PLUGIN_DIR__", plugin_dir)
+    return text.replace("__PLUGIN_DIR__", plugin_dir).replace("__HOME__", home_dir)
 
-for fname in ("config.toml", "hooks.json", "AGENT.md"):
-    src = f"{src_dir}/{fname}"
-    if not os.path.exists(src):
-        continue
-    with open(src) as f:
+# Path where generated hooks.json lives (after this install)
+generated_hooks_path = os.path.join(dst_dir, "hooks.json")
+
+# Preserve trusted_hash from previously generated config.toml (Codex approval state)
+hashes = {}
+existing_config = os.path.join(dst_dir, "config.toml")
+if os.path.exists(existing_config):
+    with open(existing_config) as f:
+        existing_cfg = f.read()
+    pattern = re.compile(
+        r'\[hooks\.state\."' + re.escape(generated_hooks_path) + r':(\w+):(\d+):(\d+)"\]\s*'
+        r'(?:enabled\s*=\s*\S+\s*)?(?:trusted_hash\s*=\s*"([^"]+)")?',
+        re.MULTILINE
+    )
+    for m in pattern.finditer(existing_cfg):
+        event, i, j, h = m.group(1), m.group(2), m.group(3), m.group(4)
+        if h:
+            hashes[f"{event}:{i}:{j}"] = h
+
+# config.toml: placeholder replace + trusted_hash inject
+src_config = os.path.join(src_dir, "config.toml")
+if os.path.exists(src_config):
+    with open(src_config) as f:
         content = replace(f.read())
-    with open(f"{dst_dir}/{fname}", "w") as f:
+    if hashes:
+        def inject_hash(m):
+            key = m.group(2)
+            h = hashes.get(key)
+            block = m.group(0)
+            if h and "trusted_hash" not in block:
+                block = block.rstrip('\n') + f'\ntrusted_hash = "{h}"\n\n'
+            return block
+        content = re.sub(
+            r'(\[hooks\.state\."' + re.escape(generated_hooks_path) + r':([^"]+)"\][^\[]*)',
+            inject_hash,
+            content,
+            flags=re.DOTALL
+        )
+    with open(os.path.join(dst_dir, "config.toml"), "w") as f:
         f.write(content)
+
+# AGENT.md: placeholder replace only
+src_agent = os.path.join(src_dir, "AGENT.md")
+if os.path.exists(src_agent):
+    with open(src_agent) as f:
+        content = replace(f.read())
+    with open(os.path.join(dst_dir, "AGENT.md"), "w") as f:
+        f.write(content)
+
+# hooks.json: base + profile override + embed CODEX_PROFILE in SessionStart commands
+base_hooks_path = os.path.join(plugin_dir, "plugin", "hooks", "codex-hooks.json")
+with open(base_hooks_path) as f:
+    merged = json.loads(replace(f.read()))
+
+profile_hooks_path = os.path.join(src_dir, "hooks.json")
+if os.path.exists(profile_hooks_path):
+    with open(profile_hooks_path) as f:
+        profile_hooks = json.loads(replace(f.read()))
+    for event, matchers in profile_hooks.get("hooks", {}).items():
+        merged["hooks"].setdefault(event, []).extend(matchers)
+
+# Embed CODEX_PROFILE so the hook subprocess knows its profile without shell_environment_policy
+for matcher_group in merged["hooks"].get("SessionStart", []):
+    for hook in matcher_group.get("hooks", []):
+        if hook.get("type") == "command":
+            hook["command"] = f"CODEX_PROFILE={profile_name} {hook['command']}"
+
+with open(os.path.join(dst_dir, "hooks.json"), "w") as f:
+    json.dump(merged, f, indent=2, ensure_ascii=False)
+    f.write("\n")
 PYEOF
   echo "      생성: plugin/deploy/.generated/$preset/"
 done
@@ -163,7 +228,7 @@ done
 # 6. ~/.codex/hooks.json 배포 (solo 모드 전역 훅)
 echo "[6/6] ~/.codex/hooks.json 배포 (solo 모드 전역 훅)..."
 mkdir -p "$HOME/.codex"
-python3 - "$DEPLOY_DIR/codex-tdd/hooks.json" "$HOME/.codex/hooks.json" "$PLUGIN_DIR" <<'PYEOF'
+python3 - "$PLUGIN_DIR/plugin/hooks/codex-hooks.json" "$HOME/.codex/hooks.json" "$PLUGIN_DIR" <<'PYEOF'
 import sys, json, os, shutil
 
 src, dst, plugin_dir = sys.argv[1], sys.argv[2], sys.argv[3]
