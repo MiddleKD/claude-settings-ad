@@ -8,9 +8,6 @@
 model = "gpt-5.3-codex"
 model_reasoning_effort = "medium"
 
-[features]
-hooks = true
-
 [projects."__PLUGIN_DIR__"]
 trust_level = "trusted"
 
@@ -21,19 +18,17 @@ args = ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-s
 [marketplaces.middlek-settings]
 source_type = "local"
 source = "__PLUGIN_DIR__"
-last_updated = "2026-05-15T00:00:00Z"
 
 [marketplaces.agent-deck]
 source_type = "git"
 source = "https://github.com/asheshgoplani/agent-deck.git"
-last_updated = "2026-05-15T00:00:00Z"
 
 [marketplaces.tdd-guard]
 source_type = "git"
 source = "https://github.com/nizos/tdd-guard.git"
-last_updated = "2026-05-15T00:00:00Z"
 
 [marketplaces.chorus-plugins]
 source_type = "git"
 source = "https://github.com/Chorus-AIDLC/Chorus.git"
-last_updated = "2026-05-15T00:00:00Z"
+
+# END middlek-presets
