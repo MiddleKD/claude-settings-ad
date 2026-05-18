@@ -11,23 +11,19 @@ model_reasoning_effort = "medium"
 [projects."__PLUGIN_DIR__"]
 trust_level = "trusted"
 
-[mcp_servers.serena]
-command = "uvx"
-args = ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server"]
-
 [marketplaces.middlek-settings]
 source_type = "local"
 source = "__PLUGIN_DIR__"
 
-[marketplaces.agent-deck]
+[marketplaces.superpowers-dev]
+last_updated = "2026-05-18T02:09:23Z"
+last_revision = "f2cbfbefebbfef77321e4c9abc9e949826bea9d7"
 source_type = "git"
-source = "https://github.com/asheshgoplani/agent-deck.git"
-
-[marketplaces.tdd-guard]
-source_type = "git"
-source = "https://github.com/nizos/tdd-guard.git"
+source = "https://github.com/obra/superpowers.git"
 
 [marketplaces.chorus-plugins]
+last_updated = "2026-05-18T02:09:21Z"
+last_revision = "1b5954f3203a59da6aa33fdd78724763ea23d37a"
 source_type = "git"
 source = "https://github.com/Chorus-AIDLC/Chorus.git"
 

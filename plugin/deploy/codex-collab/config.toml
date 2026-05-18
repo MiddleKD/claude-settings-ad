@@ -18,21 +18,11 @@ enabled = true
 [projects."__PLUGIN_DIR__"]
 trust_level = "trusted"
 
-[mcp_servers.serena]
-command = "uvx"
-args = ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server"]
-
 [plugins."middlek-settings@middlek-settings"]
 enabled = true
 
-[plugins."superpowers@claude-plugins-official"]
+[plugins."superpowers@openai-curated"]
 enabled = true
-
-[plugins."agent-deck@agent-deck"]
-enabled = true
-
-[plugins."tdd-guard@tdd-guard"]
-enabled = false
 
 [plugins."chorus@chorus-plugins"]
 enabled = true
