@@ -52,17 +52,17 @@ function main() {
 
   const lines = [];
 
-  // Profile AGENT.md — copy to {projectRoot}/.codex/AGENT.md per project (like CLAUDE.md logic)
+  // Profile AGENTS.md — copy to {projectRoot}/.codex/AGENTS.md per project (like CLAUDE.md logic)
   let agentsCopied = false;
   let agentsUserModified = false;
   const codexProfile = process.env.CODEX_PROFILE;
   if (codexProfile) {
-    const src = path.join(__dirname, '../deploy', `codex-${codexProfile}`, 'AGENT.md');
+    const src = path.join(__dirname, '../deploy', `codex-${codexProfile}`, 'AGENTS.md');
     if (fs.existsSync(src)) {
       const srcContent = fs.readFileSync(src, 'utf8');
       const srcHash = sha256(srcContent);
       const hashDir = path.join(projectRoot, '.codex');
-      const dest = path.join(hashDir, 'AGENT.md');
+      const dest = path.join(hashDir, 'AGENTS.md');
       const hashFile = path.join(hashDir, '.profile-agents-md.sha');
 
       let destHash = null;
@@ -236,8 +236,8 @@ function main() {
   const notices = [];
   if (profileCopied) notices.push(`Profile CLAUDE.md updated (${profile}) — takes effect from NEXT session`);
   if (profileUserModified) notices.push(`Profile CLAUDE.md (${profile}) skipped — local .claude/CLAUDE.md has user modifications`);
-  if (agentsCopied) notices.push(`Profile AGENT.md updated (${codexProfile}) at .codex/AGENT.md — takes effect from NEXT session`);
-  if (agentsUserModified) notices.push(`Profile AGENT.md (${codexProfile}) skipped — local .codex/AGENT.md has user modifications`);
+  if (agentsCopied) notices.push(`Profile AGENTS.md updated (${codexProfile}) at .codex/AGENTS.md — takes effect from NEXT session`);
+  if (agentsUserModified) notices.push(`Profile AGENTS.md (${codexProfile}) skipped — local .codex/AGENTS.md has user modifications`);
   const systemMessage = notices.length > 0
     ? `🚀 Prepare session... ⚠️ ${notices.join(' / ')}`
     : '🚀 Prepare session...';

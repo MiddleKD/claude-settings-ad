@@ -136,7 +136,7 @@ print("      완료: model, model_reasoning_effort, projects trust_level 추가�
 PYEOF
 fi
 
-# 5. .generated/ 에 Codex preset config.toml + hooks.json + AGENT.md 생성
+# 5. .generated/ 에 Codex preset config.toml + hooks.json + AGENTS.md 생성
 echo "[5/6] .generated/ 디렉토리에 Codex preset 파일 생성..."
 for preset in codex-tdd codex-collab codex-full codex-minimal; do
   mkdir -p "$DEPLOY_DIR/.generated/$preset"
@@ -192,12 +192,12 @@ if os.path.exists(src_config):
     with open(os.path.join(dst_dir, "config.toml"), "w") as f:
         f.write(content)
 
-# AGENT.md: placeholder replace only
-src_agent = os.path.join(src_dir, "AGENT.md")
+# AGENTS.md: placeholder replace only
+src_agent = os.path.join(src_dir, "AGENTS.md")
 if os.path.exists(src_agent):
     with open(src_agent) as f:
         content = replace(f.read())
-    with open(os.path.join(dst_dir, "AGENT.md"), "w") as f:
+    with open(os.path.join(dst_dir, "AGENTS.md"), "w") as f:
         f.write(content)
 
 # hooks.json: base + profile override + embed CODEX_PROFILE in SessionStart commands

@@ -25,6 +25,9 @@ args = ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-s
 [plugins."middlek-settings@middlek-settings"]
 enabled = true
 
+[plugins."superpowers@claude-plugins-official"]
+enabled = true
+
 [plugins."agent-deck@agent-deck"]
 enabled = true
 
